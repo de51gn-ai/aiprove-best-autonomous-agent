@@ -53,9 +53,20 @@ const PROBES = [
 const deepEqual = (a, b) => JSON.stringify(a) === JSON.stringify(b);
 
 export async function solveBugHunt() {
-  const res = await fetch(UTILS_URL, { signal: AbortSignal.timeout(20000) });
-  if (!res.ok) throw new Error(`utils.js fetch failed: HTTP ${res.status}`);
-  const src = await res.text();
+  let src;
+  let lastError;
+  for (let i = 0; i < 2; i++) {
+    try {
+      const res = await fetch(UTILS_URL, { signal: AbortSignal.timeout(45000) });
+      if (!res.ok) throw new Error(`utils.js fetch failed: HTTP ${res.status}`);
+      src = await res.text();
+      break;
+    } catch (e) {
+      lastError = e;
+      if (i === 0) await new Promise((r) => setTimeout(r, 5000));
+    }
+  }
+  if (src === undefined) throw lastError;
   // Load the challenge file in a minimal CommonJS shim. The source comes
   // from the official AIProve challenges repo (public, read-only).
   const module = { exports: {} };

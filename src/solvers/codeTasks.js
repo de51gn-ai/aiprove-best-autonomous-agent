@@ -6,10 +6,21 @@ import { spawn } from "node:child_process";
 
 const RAW = "https://raw.githubusercontent.com/AIProveRH/aiprove/main/challenges";
 
-async function fetchJson(url) {
-  const res = await fetch(url, { signal: AbortSignal.timeout(20000) });
-  if (!res.ok) throw new Error(`fetch failed: HTTP ${res.status} for ${url}`);
-  return res.json();
+// One retry after a short pause: public-asset fetches occasionally stall and
+// a single timeout should not kill an otherwise healthy run.
+async function fetchJson(url, attempts = 2) {
+  let lastError;
+  for (let i = 0; i < attempts; i++) {
+    try {
+      const res = await fetch(url, { signal: AbortSignal.timeout(45000) });
+      if (!res.ok) throw new Error(`fetch failed: HTTP ${res.status} for ${url}`);
+      return await res.json();
+    } catch (e) {
+      lastError = e;
+      if (i < attempts - 1) await new Promise((r) => setTimeout(r, 5000));
+    }
+  }
+  throw lastError;
 }
 
 const approx = (a, b) => Math.abs(a - b) < 1e-9;

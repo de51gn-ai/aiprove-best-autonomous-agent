@@ -48,9 +48,25 @@
   many repositories, too quickly") after the code-golf repo was created.
   Retried in run 2 (below) after the throttle lifted.
 
-## Test run 2 — targeted retry, fastest-primes only (pending)
+## Test run 2 — targeted retry, fastest-primes only, 2026-11-14 ~00:45 WIB
 
-- Added to `publish.js`: retry-once after 120s on GitHub rate-limit errors,
-  and reuse of an already-existing repo (clone + commit + push) instead of
-  failing on re-runs. Added `--only slug` flag to the orchestrator.
-- (Run 2 result recorded here once complete.)
+- Failed on a transient network timeout fetching the public `cases.json`
+  (20s fetch abort). No submission made; the run's ephemeral identity
+  (`0xB019f2A3d9F2a58705c91c6B2920449fd25A9C38`) only entered the bounty.
+- Fix applied: solver fetches now retry once after 5s with a 45s timeout
+  (`codeTasks.js`, `bugHunt.js`).
+
+## Test run 3 — targeted retry, fastest-primes only, 2026-11-14 ~00:50 WIB
+
+- Identity: ephemeral keypair `0x6f01a54F36C85b48D8cCcedA7d5664e13B666093`.
+- `fastest-primes`: solver verified 5/5 cases, repo published
+  (`de51gn-ai/aiprove-agent-fastest-primes`, GitHub throttle had lifted),
+  submission `3a60acf3` — `provenance_ok`, verified 1/1.
+
+## Totals across test runs
+
+- Distinct bounties completed by the agent: **11 of 21** (8 forecasts +
+  code-golf-expr + fastest-primes + bug-hunt-utils). All 11 submissions
+  `provenance_ok` and verified via `/api/me/submissions` inside the runs.
+- The remaining 10 were entered and skipped with documented reasons (see
+  README); none were attempted and faked.
